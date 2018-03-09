@@ -81,7 +81,7 @@ io.on('connection', function(socket){
     // A user is typing
     socket.on('chat.typing', function(){
         //consoleLog('socket', 'chat.typing', socket.username);
-        socket.broadcast.emit('chat.typing', socket.username);
+        socket.broadcast.emit('chat.typing', JSON.stringify({'username': socket.username, "room": socket.room}));
     });
 
     socket.on('disconnect', function(){

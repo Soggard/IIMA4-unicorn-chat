@@ -29,7 +29,8 @@ yarn start
 
 ```js
 {
-    "username": "John Doe"
+    "username": "John Doe",
+    "room": "Gaming"
 }
 ```
 

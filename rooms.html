@@ -3,11 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <title>Select a rool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            font: 13px Helvetica, Arial;
+            height: 100%;
+            background: #fee8fb;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background-image: url('http://maxlab.fr/wp-content/uploads/2014/05/png-293x300.png');
+        }
+
+        #rooms {
+            margin-left: auto;
+            margin-right: auto;
+            background-color: #b028ab;
+            border-radius: 20px;
+            padding: 50px;
+            color: white;
+        }
+        #rooms a {
+            color: white;
+            text-decoration: none;
+        }
+        #rooms a:hover {
+            color: #ff7ac4;
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
-    <p>Please select a room</p>
-    <a href="/chill">Chill</a> <br>
-    <a href="/work">Work</a> <br>
-    <a href="/gaming">Gaming</a> <br>
+    <div id="rooms">
+        <h1>Please select a room</h1>
+        <h3><a href="/chill">• Chill</a></h3>
+        <h3><a href="/work">• Work</a></h3>
+        <h3><a href="/gaming">• Gaming</a></h3>
+    </div>
 </body>
 </html>

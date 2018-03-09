@@ -51,12 +51,17 @@
         }
 
         #messages li {
-            padding: 5px 10px;
-            background: #eb9be0ad;
+            background: #f6d4f1d6;
+            display: block;
+            margin: 20px;
+            padding: 20px;
+            width: 400px;
+            border-radius: 15px;
+            color: #78107a;
         }
 
         #messages li:nth-child(odd) {
-            background: #fee8fb94;
+            /*background: #fee8fb94;*/
         }
 
         #typing {
@@ -65,7 +70,7 @@
             left: 10px;
         }
 
-        #users {
+        #topbar {
             position: fixed;
             background-color: #ef71f1;
             background-size: cover;
@@ -73,6 +78,7 @@
             height: 30px;
             line-height: 30px;
             text-align: center;
+            box-shadow: 0 4px 4px #b028ab
         }
 
         #rooms {
@@ -89,7 +95,10 @@
 </head>
 <body>
 <!-- Show if user is connected/disconnected from socket -->
-<div id="users"></div>
+<div id="topbar">
+    <b><span id="room"></span> -</b>
+    <span id="users"></span>
+</div>
 <div id="rooms">
     <a href="/chill">Chill</a>
     <a href="/work">Work</a>
@@ -149,19 +158,22 @@
 
         socket.on('chat.room', (data) => {
             room = data;
-            console.log(room);
+            $('#room').html(room);
         });
 
         socket.on('chat.message', (data) => {
             var json = JSON.parse(data);
             if (json.room === '' || json.room === room) {
-                messages.prepend("<li>"+json.username+" : "+json.message+"</li>");
+                messages.prepend("<li><b>"+json.username+"</b><br><br>"+json.message+"</li>");
             }
         });
 
-        socket.on('chat.typing', (typingUser) => {
-            typing.html(typingUser + " is typing a message. <img src=\"http://gifimage.net/wp-content/uploads/2017/11/imessage-typing-indicator-gif-7.gif\" alt=\"\">");
-            setTimeout(function(){ typing.html(''); }, 3000);
+        socket.on('chat.typing', (data) => {
+            var json = JSON.parse(data);
+            if (json.room === room) {
+                typing.html(json.username + " is typing a message. <img src=\"http://gifimage.net/wp-content/uploads/2017/11/imessage-typing-indicator-gif-7.gif\" alt=\"\">");
+                setTimeout(function(){ typing.html(''); }, 3000);
+            }
         });
 
         socket.on('chat.leave', (data) => {
