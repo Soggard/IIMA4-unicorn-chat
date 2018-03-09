@@ -1,4 +1,4 @@
 /node_modules/
-yanr.lock
+yarn.lock
 
 .idea/workspace.xml
