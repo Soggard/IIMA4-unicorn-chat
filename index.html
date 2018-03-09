@@ -1,0 +1,174 @@
+<!doctype html>
+<html>
+<head>
+    <title>Socket.IO chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            font: 13px Helvetica, Arial;
+            height: 100%;
+            background: #fee8fb;
+        }
+
+        form {
+            background: #fb00ff;
+            padding: 3px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        form input {
+            border: 0;
+            padding: 10px;
+            width: 90%;
+            margin-right: .5%;
+        }
+
+        form button {
+            width: 9%;
+            background: rgb(120, 35, 117);
+            border: none;
+            padding: 10px;
+            color: white;
+        }
+
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            max-height: 100%;
+            padding-top: 30px;
+            overflow: auto;
+            padding-bottom: 45px;
+            background-image: url('http://maxlab.fr/wp-content/uploads/2014/05/png-293x300.png');
+            height: 100%;
+        }
+
+        #messages li {
+            padding: 5px 10px;
+            background: #eb9be0ad;
+        }
+
+        #messages li:nth-child(odd) {
+            background: #fee8fb94;
+        }
+
+        #typing {
+            position: absolute;
+            bottom: 5px;
+            left: 10px;
+        }
+
+        #users {
+            position: fixed;
+            background-color: #ef71f1;
+            background-size: cover;
+            width: 100%;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+        }
+
+        #rooms {
+            position: absolute;
+            right: 10px;
+            line-height: 30px;
+        }
+
+        #typing img{
+            height: 100px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+<!-- Show if user is connected/disconnected from socket -->
+<div id="users"></div>
+<div id="rooms">
+    <a href="/chill">Chill</a>
+    <a href="/work">Work</a>
+    <a href="/gaming">Gaming</a>
+</div>
+<ul id="messages"></ul>
+<ul id="typing"></ul>
+<form action="">
+    <input id="m" autocomplete="off"/>
+    <button>Send</button>
+</form>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+<script>
+    (function ($) {
+        let socket = io();
+        let users = $('#users');
+        let messages = $('#messages');
+        let typing = $('#typing');
+        let inputMessage = $("#m");
+        let username;
+        let room = '';
+
+
+
+        $('form').submit(function(){
+            if (inputMessage.val() !== '') socket.emit('chat.message', inputMessage.val());
+            inputMessage.val('');
+            console.log('Sent');
+            return false;
+        });
+
+        inputMessage.keypress(function(){
+            socket.emit('chat.typing');
+        });
+
+        // Vérification du username
+        if (typeof(Storage) !== undefined) {
+            username = localStorage.getItem('chatUsername');
+        }
+        while (username === undefined || username === '' || username === null) {
+            username = prompt("Your username:");
+            if (typeof(Storage) !== undefined) {
+                localStorage.setItem('chatUsername', username);
+            }
+        }
+
+        socket.emit('chat.join', JSON.stringify({'username': username}));
+
+        socket.on('chat.join', (data) => {
+            var json = JSON.parse(data);
+            users.html(`<span>${json}</span>`);
+        });
+
+        socket.on('chat.room', (data) => {
+            room = data;
+            console.log(room);
+        });
+
+        socket.on('chat.message', (data) => {
+            var json = JSON.parse(data);
+            if (json.room === '' || json.room === room) {
+                messages.prepend("<li>"+json.username+" : "+json.message+"</li>");
+            }
+        });
+
+        socket.on('chat.typing', (typingUser) => {
+            typing.html(typingUser + " is typing a message. <img src=\"http://gifimage.net/wp-content/uploads/2017/11/imessage-typing-indicator-gif-7.gif\" alt=\"\">");
+            setTimeout(function(){ typing.html(''); }, 3000);
+        });
+
+        socket.on('chat.leave', (data) => {
+            var json = JSON.parse(data);
+            users.html(`<span>${json}</span>`);
+        });
+    })(jQuery);
+</script>
+</body>
+</html>
